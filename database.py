@@ -4,6 +4,7 @@ class Dbcontroller:
     def __init__(self):
         self.db = self.connect()
         # O cursor é aberto na conexão inicial
+
     def open_text(self):
         data = {}
         with open("banco.txt",'r') as file:
@@ -39,6 +40,17 @@ class Dbcontroller:
         finally:
             cursor.close()
 
+    def ler_tabela(self,tabela:str):
+        cursor = self.db.cursor()
+        query = f"SELECT * FROM {tabela}"
+        try:
+            cursor.execute(query)
+            data = cursor.fetchall()
+            return data
+        except Exception as e:
+            return f"Error: {e}"
+        finally:cursor.close()
+
     def limpar_tabela(self, tabela):
             cursor = self.db.cursor()
             
@@ -68,7 +80,6 @@ class Dbcontroller:
         finally:
             cursor.close()
 
-
     def inserir_tabela(self, tabela, dados: dict):
         cursor = self.db.cursor()
 
@@ -87,5 +98,21 @@ class Dbcontroller:
         except Exception as e:
             self.db.rollback()
             return f"Erro ao inserir na tabela {tabela} os dados: {dados} | Erro: {e}"
+        finally:
+            cursor.close()
+
+    def atualizar_tabela(self, tabela,id_nome:str, id: int, coluna: str,dado):
+        query = f"UPDATE {tabela} SET {coluna} = '{dado}' WHERE {id_nome}= '{id}'"
+        cursor = self.db.cursor()
+
+        try:
+            cursor.execute(query)
+            self.db.commit()
+            return "Dados alterados com sucesso!"
+
+        except Exception as e:
+            self.db.rollback()
+            return f"Erro!: {e}"
+
         finally:
             cursor.close()
