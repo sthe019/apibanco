@@ -3,7 +3,7 @@ import mysql.connector
 class Dbcontroller:
     def __init__(self):
         self.db = self.connect()
-        # O cursor é aberto na conexão inicial
+
     def open_text(self):
         data = {}
         with open("banco.txt",'r') as file:
@@ -23,9 +23,10 @@ class Dbcontroller:
                     database=data["database"]
                 )
             print("Sucesso ao conectar ao banco!")
+            return db
         except Exception as err:
+            print(f"Erro ao se conectar ao banco: {err}")
             return f"Erro ao se conectar ao banco: {err}"
-        return db
 
     def ler_banco(self):
         cursor = self.db.cursor()
@@ -33,11 +34,22 @@ class Dbcontroller:
             cursor.execute("SHOW TABLES")
             tabelas = cursor.fetchall()
             return tabelas
-        except:
-            print("Incapaz de realizar listagem da tabela!")
-            return
+        except Exception as err:
+            print(f"Incapaz de realizar listagem da tabela!\n{err}")
+            return f"Incapaz de realizar listagem da tabela!: {err}"
         finally:
             cursor.close()
+
+    def ler_tabela(self,tabela:str):
+        cursor = self.db.cursor()
+        query = f"SELECT * FROM {tabela}"
+        try:
+            cursor.execute(query)
+            data = cursor.fetchall()
+            return data
+        except Exception as e:
+            return f"Error: {e}"
+        finally:cursor.close()
 
     def limpar_tabela(self, tabela):
             cursor = self.db.cursor()
@@ -68,7 +80,6 @@ class Dbcontroller:
         finally:
             cursor.close()
 
-
     def inserir_tabela(self, tabela, dados: dict):
         cursor = self.db.cursor()
 
@@ -87,5 +98,21 @@ class Dbcontroller:
         except Exception as e:
             self.db.rollback()
             return f"Erro ao inserir na tabela {tabela} os dados: {dados} | Erro: {e}"
+        finally:
+            cursor.close()
+
+    def atualizar_tabela(self, tabela,id_nome:str, id: int, coluna: str,dado):
+        query = f"UPDATE {tabela} SET {coluna} = '{dado}' WHERE {id_nome}= '{id}'"
+        cursor = self.db.cursor()
+
+        try:
+            cursor.execute(query)
+            self.db.commit()
+            return "Dados alterados com sucesso!"
+
+        except Exception as e:
+            self.db.rollback()
+            return f"Erro!: {e}"
+
         finally:
             cursor.close()

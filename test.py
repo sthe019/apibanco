@@ -23,4 +23,4 @@ def gerar_clientes_tabela(numero:int):
     for c in dados:db.inserir_tabela(tabela,c)
     return print("Dados inseridos com sucesso!")
 
-db.open_text()
+#gerar_clientes_tabela(200)
