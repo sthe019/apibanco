@@ -20,6 +20,7 @@ class Produtos(BaseModel):
     imagem_nome: str
     imagem_tipo: str
     imagem_byte: bytes | None
+    imagem_url: str
     quantidade_disponivel: int
 
 class Categorias(BaseModel):
@@ -30,3 +31,15 @@ class Pedidos(BaseModel):
     data_pedido: Optional[datetime] = None
     endereco_entrega: str
     forma_pagamento: str
+    forma_pagamento: str
+
+class itenspedido(BaseModel):
+    pedido_id: int
+    produto_id: int
+    quantidade: int
+    preco_unitario: float
+
+class admins(BaseModel):
+    nome: str
+    email:str
+    senha:str

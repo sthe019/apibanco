@@ -65,6 +65,7 @@ class Dbcontroller:
             temp = cursor.fetchall()
             data = []
             for c in temp:data.append(list(c))
+            data = cursor.fetchall()
             return data
         except Exception as e:
             return f"Error: {e}"
