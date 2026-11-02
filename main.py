@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, Form, Response, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
 from database import Dbcontroller
 from modelos import *
 from datetime import datetime
@@ -89,7 +89,7 @@ def procurar_cliente(produto_id:int):
     db = get_db()
     dado = ["produto_id",produto_id]
     response = list(db.procurar_tabela(dado,tabelas[1]))
-    response.pop(8)
+    response.pop(7)
     response.insert(8,f"http://127.0.0.1:8000/produtos/{produto_id}/imagens")
     return {
         "message":response
@@ -166,6 +166,23 @@ def alterar_produto(id:int,coluna:str,dado):
             id_nome="produto_id",
         )
         }
+
+@app.patch("/alterar_imagem_produto/{id}")
+async def alterar_imagem_produto(id: int, imagem: UploadFile = File(...)):
+    db = get_db()
+    imagem_bytes = await imagem.read()
+
+    try:
+        linhas = db.atualizar_imagem_produto(
+            id, imagem_bytes, imagem.filename, imagem.content_type
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao atualizar: {e}")
+
+    if linhas == 0:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    return {"message": "Imagem atualizada com sucesso", "bytes": len(imagem_bytes)}
 
 ###################################################################
 #                                                                 #
