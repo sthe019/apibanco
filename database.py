@@ -125,19 +125,19 @@ class Dbcontroller:
         finally:
             cursor.close()
 
-    def atualizar_tabela(self, tabela,id_nome:str, id: int, coluna: str,dado):
-        query = f"UPDATE {tabela} SET {coluna} = '{dado}' WHERE {id_nome}= '{id}'"
+    def atualizar_imagem_produto(self, produto_id: int, imagem_bytes: bytes, nome: str, tipo: str):
+        query = """
+            UPDATE produtos
+            SET imagem_byte = ?, imagem_nome = ?, imagem_tipo = ?
+            WHERE produto_id = ?
+        """
         cursor = self.db.cursor()
-
         try:
-            cursor.execute(query)
+            cursor.execute(query, (imagem_bytes, nome, tipo, produto_id))
             self.db.commit()
-            return "Dados alterados com sucesso!"
-
-        except Exception as e:
+            return cursor.rowcount
+        except Exception:
             self.db.rollback()
-            return f"Erro!: {e}"
-
+            raise
         finally:
             cursor.close()
-        
