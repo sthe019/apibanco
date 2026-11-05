@@ -141,3 +141,30 @@ class Dbcontroller:
             raise
         finally:
             cursor.close()
+    def atualizar_tabela(self, tabela, coluna, dado, id, id_nome):
+        cursor = self.db.cursor()
+        try:
+            # Nome de tabela/coluna não pode ser parametrizado, então valida contra o schema
+            cursor.execute(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?",
+                (tabela,)
+            )
+            colunas_validas = [r[0].lower() for r in cursor.fetchall()]
+
+            if coluna.lower() not in colunas_validas or id_nome.lower() not in colunas_validas:
+                return f"Coluna inválida para a tabela {tabela}"
+            if coluna.lower() in (id_nome.lower(), "imagem_byte"):
+                return f"A coluna {coluna} não pode ser alterada por esta rota"
+
+            sql = f"UPDATE {tabela} SET {coluna} = ? WHERE {id_nome} = ?"
+            cursor.execute(sql, (dado, id))
+            self.db.commit()
+
+            if cursor.rowcount == 0:
+                return f"Nenhum registro encontrado em {tabela} com {id_nome} = {id}"
+            return f"Sucesso ao atualizar {coluna} na tabela {tabela}"
+        except Exception as e:
+            self.db.rollback()
+            return f"Erro ao atualizar a tabela {tabela} | Erro: {e}"
+        finally:
+            cursor.close()
