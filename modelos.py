@@ -17,7 +17,9 @@ class Produtos(BaseModel):
     descricao: str
     preco: float
     disponivel: bool
-    imagem_url: str
+    imagem_nome: str
+    imagem_tipo: str
+    imagem_byte: bytes | None
     quantidade_disponivel: int
 
 class Categorias(BaseModel):
@@ -27,7 +29,10 @@ class Pedidos(BaseModel):
     cliente_id: int
     data_pedido: Optional[datetime] = None
     endereco_entrega: str
+    status:str
+    valortotal:float
     forma_pagamento: str
+    
 
 class itenspedido(BaseModel):
     pedido_id: int

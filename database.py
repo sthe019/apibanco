@@ -1,8 +1,8 @@
-import mysql.connector
+from mssql_python import connect
 
 class Dbcontroller:
     def __init__(self):
-        self.db = self.connect()
+        self.db = self.connect_database()
 
     def open_text(self):
         data = {}
@@ -13,26 +13,34 @@ class Dbcontroller:
 
         return data
 
-    def connect(self):
+    
+    def connect_database(self):
         try:
             data = self.open_text()
-            db = self.db = mysql.connector.connect(
-                    host="localhost",
-                    user=data["user"],
-                    password=data["password"],
-                    database=data["database"]
-                )
+
+            conn_str = (
+                f"Server={data['server']};"
+                f"Database={data['database']};"
+                f"Trusted_Connection=yes;"
+                f"Encrypt=no;"
+            )
+
+            db = connect(conn_str)
             print("Sucesso ao conectar ao banco!")
             return db
+
         except Exception as err:
             print(f"Erro ao se conectar ao banco: {err}")
-            return f"Erro ao se conectar ao banco: {err}"
+            raise
+
 
     def ler_banco(self):
         cursor = self.db.cursor()
         try:
-            cursor.execute("SHOW TABLES")
-            tabelas = cursor.fetchall()
+            cursor.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'")
+            temp = cursor.fetchall()
+            tabelas = []
+            for c in temp:tabelas.append(list(c))
             return tabelas
         except Exception as err:
             print(f"Incapaz de realizar listagem da tabela!\n{err}")
@@ -40,12 +48,28 @@ class Dbcontroller:
         finally:
             cursor.close()
 
+    def procurar_tabela(self,identificador:list,tabela:str):
+        cursor = self.db.cursor()
+        query = f"select * from site.dbo.{tabela} where {identificador[0]} = {identificador[1]};"
+        try:
+            cursor.execute(query)
+            response = cursor.fetchall()[0]
+            return response
+        except Exception as e:
+            response = f"Error: {e}"
+            return response
+        finally:
+            cursor.close()
+
+
     def ler_tabela(self,tabela:str):
         cursor = self.db.cursor()
         query = f"SELECT * FROM {tabela}"
         try:
             cursor.execute(query)
-            data = cursor.fetchall()
+            temp = cursor.fetchall()
+            data = []
+            for c in temp:data.append(list(c))
             return data
         except Exception as e:
             return f"Error: {e}"
@@ -65,10 +89,11 @@ class Dbcontroller:
                 return f"Erro ao limpar a tabela {tabela}| Erro: {e}"
             finally:
                 cursor.close()
+                
 
     def remover_de_tabela(self, tabela, indentificador_nome, identificador):
         cursor = self.db.cursor()
-        sql = f"DELETE FROM {tabela} WHERE {indentificador_nome} = %s" # ou ? dependendo do banco
+        sql = f"DELETE FROM {tabela} WHERE {indentificador_nome} = ?"
 
         try:
             cursor.execute(sql, (identificador,))
@@ -85,11 +110,10 @@ class Dbcontroller:
 
         
         colunas = ", ".join(dados.keys())
-        placeholders = ", ".join(["%s"] * len(dados))
+        placeholders = ", ".join(["?"] * len(dados))
         valores = tuple(dados.values())
         
         query_insercao = f"INSERT INTO {tabela} ({colunas}) VALUES ({placeholders})"   
-        print(query_insercao)
         
         try:
             cursor.execute(query_insercao, valores)
@@ -101,18 +125,46 @@ class Dbcontroller:
         finally:
             cursor.close()
 
-    def atualizar_tabela(self, tabela,id_nome:str, id: int, coluna: str,dado):
-        query = f"UPDATE {tabela} SET {coluna} = '{dado}' WHERE {id_nome}= '{id}'"
+    def atualizar_imagem_produto(self, produto_id: int, imagem_bytes: bytes, nome: str, tipo: str):
+        query = """
+            UPDATE produtos
+            SET imagem_byte = ?, imagem_nome = ?, imagem_tipo = ?
+            WHERE produto_id = ?
+        """
         cursor = self.db.cursor()
-
         try:
-            cursor.execute(query)
+            cursor.execute(query, (imagem_bytes, nome, tipo, produto_id))
             self.db.commit()
-            return "Dados alterados com sucesso!"
+            return cursor.rowcount
+        except Exception:
+            self.db.rollback()
+            raise
+        finally:
+            cursor.close()
+    def atualizar_tabela(self, tabela, coluna, dado, id, id_nome):
+        cursor = self.db.cursor()
+        try:
+            # Nome de tabela/coluna não pode ser parametrizado, então valida contra o schema
+            cursor.execute(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?",
+                (tabela,)
+            )
+            colunas_validas = [r[0].lower() for r in cursor.fetchall()]
 
+            if coluna.lower() not in colunas_validas or id_nome.lower() not in colunas_validas:
+                return f"Coluna inválida para a tabela {tabela}"
+            if coluna.lower() in (id_nome.lower(), "imagem_byte"):
+                return f"A coluna {coluna} não pode ser alterada por esta rota"
+
+            sql = f"UPDATE {tabela} SET {coluna} = ? WHERE {id_nome} = ?"
+            cursor.execute(sql, (dado, id))
+            self.db.commit()
+
+            if cursor.rowcount == 0:
+                return f"Nenhum registro encontrado em {tabela} com {id_nome} = {id}"
+            return f"Sucesso ao atualizar {coluna} na tabela {tabela}"
         except Exception as e:
             self.db.rollback()
-            return f"Erro!: {e}"
-
+            return f"Erro ao atualizar a tabela {tabela} | Erro: {e}"
         finally:
             cursor.close()
