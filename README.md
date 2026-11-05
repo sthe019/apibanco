@@ -7,6 +7,7 @@ Projeto de uma **loja virtual** composta por três partes integradas:
 3. Uma **interface desktop para Windows** (`INTERFACE/loja_app.exe`, aplicativo **Flutter**) que consome a API.
 
 > Projeto acadêmico — UNIP, 4º semestre (PIM).
+> Acompanhamento: [Kanban no Trello](https://trello.com/invite/b/6aa0a5736922504031281750/ATTId61a1befb7ce7742c3822a4ee859d15978FFF31F/unip-4-semestre)
 > Repositório: [rafasdsm/apibanco](https://github.com/rafasdsm/apibanco) · Release: [`release`](https://github.com/rafasdsm/apibanco/releases/tag/release)
 
 ---

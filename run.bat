@@ -1,4 +1,3 @@
-
 @echo off
 setlocal
 chcp 65001 > nul
@@ -118,34 +117,32 @@ set /p DB_EXISTS=<"%DB_RESULT%"
 
 del "%DB_RESULT%" "%DB_ERROR%" > nul 2>&1
 
-:: 7. Criar banco e gerar dados apenas se nao existir
-if "%DB_EXISTS%"=="1" (
-    echo [INFO] Banco %DB_NAME% ja existe.
-    echo [INFO] Pulando criacao e geracao de dados.
+:: 7. Criar banco (se nao existir) e garantir atualizacao/geracao de dados
+if "%DB_EXISTS%"=="0" (
+    echo [INFO] Banco inexistente. Criando banco...
 ) else (
-    echo [INFO] Banco inexistente.
-    echo [INFO] Executando site.sql...
+    echo [INFO] Banco %DB_NAME% ja existe. Verificando estrutura...
+)
 
-    if not exist "site.sql" (
-        echo [ERRO] site.sql nao encontrado.
-        pause
-        exit /b 1
-    )
+if not exist "site.sql" (
+    echo [ERRO] site.sql nao encontrado.
+    pause
+    exit /b 1
+)
 
-    sqlcmd -S "%SQL_SERVER%" -E -C -b -d master -i "site.sql"
-    if errorlevel 1 (
-        echo [ERRO] Falha ao executar site.sql.
-        pause
-        exit /b 1
-    )
+sqlcmd -S "%SQL_SERVER%" -E -C -b -d master -i "site.sql"
+if errorlevel 1 (
+    echo [ERRO] Falha ao executar site.sql.
+    pause
+    exit /b 1
+)
 
-    echo [INFO] Gerando dados iniciais...
-    python3 "generate_data.py"
-    if errorlevel 1 (
-        echo [ERRO] Falha ao executar generate_data.py.
-        pause
-        exit /b 1
-    )
+echo [INFO] Gerando / atualizando dados iniciais...
+python3 "generate_data.py"
+if errorlevel 1 (
+    echo [ERRO] Falha ao executar o script de geracao de dados.
+    pause
+    exit /b 1
 )
 
 :: 8. Iniciar aplicacao

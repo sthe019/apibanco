@@ -15,7 +15,7 @@ function Stop-Script {
 }
 
 Write-Host '========================================'
-Write-Host '      INICIALIZADOR DO PROJETO'
+Write-Host '       INICIALIZADOR DO PROJETO'
 Write-Host '========================================'
 Write-Host ''
 
@@ -90,23 +90,21 @@ if ($LASTEXITCODE -ne 0) {
 
 $dbExiste = ($saida | Out-String).Trim() -eq '1'
 
-# 7. Criar banco e gerar dados apenas se nao existir
-if ($dbExiste) {
-    Write-Host "[INFO] Banco $DbName ja existe."
-    Write-Host '[INFO] Pulando criacao e geracao de dados.'
+# 7. Criar banco (se nao existir) e garantir atualizacao/geracao de dados
+if (-not $dbExiste) {
+    Write-Host "[INFO] Banco inexistente. Criando banco..."
 } else {
-    Write-Host '[INFO] Banco inexistente.'
-    Write-Host '[INFO] Executando site.sql...'
-
-    if (-not (Test-Path 'site.sql')) { Stop-Script 'site.sql nao encontrado.' }
-
-    & sqlcmd -S $SqlServer -E -C -b -d master -i 'site.sql'
-    if ($LASTEXITCODE -ne 0) { Stop-Script 'Falha ao executar site.sql.' }
-
-    Write-Host '[INFO] Gerando dados iniciais...'
-    python3 'generate_data.py'
-    if ($LASTEXITCODE -ne 0) { Stop-Script 'Falha ao executar generate_data.py.' }
+    Write-Host "[INFO] Banco $DbName ja existe. Verificando estrutura..."
 }
+
+if (-not (Test-Path 'site.sql')) { Stop-Script 'site.sql nao encontrado.' }
+
+& sqlcmd -S $SqlServer -E -C -b -d master -i 'site.sql'
+if ($LASTEXITCODE -ne 0) { Stop-Script 'Falha ao executar site.sql.' }
+
+Write-Host '[INFO] Gerando / atualizando dados iniciais...'
+python3 'generate_data.py'
+if ($LASTEXITCODE -ne 0) { Stop-Script 'Falha ao executar o script de geracao de dados.' }
 
 # 8. Iniciar aplicacao
 if (-not (Test-Path 'run.py')) { Stop-Script 'run.py nao encontrado.' }

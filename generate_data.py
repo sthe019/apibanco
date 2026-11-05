@@ -42,8 +42,8 @@ class GenerateFakeData:
                         for c in range(11):
                             cpf += str(randint(0,9))
                         data = cpf
-                if data not in lista:lista.append(data)
-                if len(lista) == 250:break
+                if data not in lista: lista.append(data)
+                if len(lista) == 250: break
             return lista
         
         names = generate_withoutclones(0)
@@ -66,16 +66,16 @@ class GenerateFakeData:
             clientes.append(cliente)
         
         for c in clientes:
-            self.db.inserir_tabela("clientes",c)
+            self.db.inserir_tabela("clientes", c)
             print(f"Cliente adicionado ao banco: {c['nome']}")
 
     def generate_categorias(self):
         print("!"*100)
         print("Gerando categorias!")
         print("!"*100)
-        self.db.inserir_tabela("categorias",{"nome":"materiais"})
-        self.db.inserir_tabela("categorias",{"nome":"padaria"})
-        self.db.inserir_tabela("categorias",{"nome":"bebidas"})
+        self.db.inserir_tabela("categorias", {"nome":"materiais"})
+        self.db.inserir_tabela("categorias", {"nome":"padaria"})
+        self.db.inserir_tabela("categorias", {"nome":"bebidas"})
 
     def generate_produtos(self):
         print("¨"*100)
@@ -90,69 +90,68 @@ class GenerateFakeData:
         categoria_padaria = categorias[1][0]
         categoria_bebidas = categorias[2][0]
 
-        #############################################################################
-        #                                   materiais                               #
-        #############################################################################
+        # #############################################################################
+        #                                  materiais                                  #
+        # #############################################################################
 
         material_folder = "assets/material"
-        material_filelist = listdir("assets/material")
+        material_filelist = listdir(material_folder)
         for c in material_filelist:
             material_object = {
-                "categoria_id":categoria_materiais,
-                "nome":c.split('.')[0].title(),
+                "categoria_id": categoria_materiais,
+                "nome": c.split('.')[0].title(),
                 "descricao": descricao,
                 "preco": float(f"{randint(1,60)}.{randint(0,9)}"),
-                "disponivel":True,
-                "quantidade_disponivel":randint(1,20),
-                "imagem_byte":open(material_folder+'/'+c,'rb').read(),
-                "imagem_nome":c,
+                "disponivel": True,
+                "quantidade_disponivel": randint(1,20),
+                "imagem_byte": open(material_folder + '/' + c, 'rb').read(),
+                "imagem_nome": c,
                 "imagem_tipo": f"image/{c.split('.')[1]}"
             }
-            self.db.inserir_tabela('produtos',material_object)
+            self.db.inserir_tabela('produtos', material_object)
             print(f"Produto adicionado! {material_object['nome']}")
 
-
-        #############################################################################
-        #                                   padaria                                 #
-        #############################################################################
+        # #############################################################################
+        #                                  padaria                                    #
+        # #############################################################################
         
         padaria_folder = "assets/padaria"
-        padaria_filelist = listdir("assets/padaria")
+        padaria_filelist = listdir(padaria_folder)
         for c in padaria_filelist:
             padaria_object = {
-                        "categoria_id":categoria_padaria,
-                        "nome":c.split('.')[0].title(),
-                        "descricao": descricao,
-                        "preco": float(f"{randint(1,60)}.{randint(0,9)}"),
-                        "disponivel":True,
-                        "quantidade_disponivel":randint(1,20),
-                        "imagem_byte":open(padaria_folder+'/'+c,'rb').read(),
-                        "imagem_nome":c,
-                        "imagem_tipo": f"image/{c.split('.')[1]}"
-                    }
-            self.db.inserir_tabela('produtos',padaria_object)
+                "categoria_id": categoria_padaria,
+                "nome": c.split('.')[0].title(),
+                "descricao": descricao,
+                "preco": float(f"{randint(1,60)}.{randint(0,9)}"),
+                "disponivel": True,
+                "quantidade_disponivel": randint(1,20),
+                "imagem_byte": open(padaria_folder + '/' + c, 'rb').read(),
+                "imagem_nome": c,
+                "imagem_tipo": f"image/{c.split('.')[1]}"
+            }
+            self.db.inserir_tabela('produtos', padaria_object)
             print(f"Produto adicionado! {padaria_object['nome']}")
         
-        #############################################################################
-        #                                   padaria                                 #
-        #############################################################################
+        # #############################################################################
+        #                                  bebidas                                    #
+        # #############################################################################
                 
         bebidas_folder = "assets/bebidas"
-        bebidas_filelist = listdir("assets/bebidas")
+        bebidas_filelist = listdir(bebidas_folder)
 
         for c in bebidas_filelist:
             bebidas_object = {
-                                "categoria_id":categoria_bebidas,
-                                "nome":c.split('.')[0].title(),
-                                "descricao": descricao,
-                                "preco": float(f"{randint(1,60)}.{randint(0,9)}"),
-                                "disponivel":True,
-                                "quantidade_disponivel":randint(1,20),
-                                "imagem_byte":open(bebidas_folder+'/'+c,'rb').read(),
-                                "imagem_nome":c,
-                                "imagem_tipo": f"image/{c.split('.')[1]}"
-                            }
-            self.db.inserir_tabela('produtos',bebidas_object)
+                "categoria_id": categoria_bebidas,
+                "nome": c.split('.')[0].title(),
+                "descricao": descricao,
+                "preco": float(f"{randint(1,60)}.{randint(0,9)}"),
+                "disponivel": True,
+                "quantidade_disponivel": randint(1,20),
+                "imagem_byte": open(bebidas_folder + '/' + c, 'rb').read(),
+                "imagem_nome": c,
+                "imagem_tipo": f"image/{c.split('.')[1]}"
+            }
+            self.db.inserir_tabela('produtos', bebidas_object)
             print(f"Produto adicionado! {bebidas_object['nome']}")      
     
     def generate_admins(self):
@@ -160,10 +159,10 @@ class GenerateFakeData:
         print("Gerando Administradores!")
         print("#"*100)
         
-        self.db.inserir_tabela("admins",{
-            "nome":"rafael",
-            "email":"rafasdsm@gmail.com",
-            "senha":"12345"
+        self.db.inserir_tabela("admins", {
+            "nome": "rafael",
+            "email": "rafasdsm@gmail.com",
+            "senha": "12345"
         })
         
         for _ in range(5):  # Cria 5 administradores falsos
@@ -187,63 +186,67 @@ class GenerateFakeData:
             print("Gere clientes e produtos antes de gerar pedidos!")
             return
 
-        status_pagamento = ["pendente", "pago","cancelado"]
-        status_entrega = ["Em preparacao", "Em rota de entrega","Entregue"]
-        formas_pagamento = ["Pix","Crédito","Débito"]
+        status_pagamento = ["pendente", "pago", "cancelado"]
+        status_entrega = ["Em preparacao", "Em rota de entrega", "Entregue"]
+        formas_pagamento = ["Pix", "Crédito", "Débito"]
 
         for _ in range(qtd_pedidos):
             cliente = choice(clientes)
+            cliente_id = cliente[0]
+            endereco_cliente = cliente[5]
 
-            # data aleatória nos últimos 365 dias
+            # Data aleatória nos últimos 365 dias
             data_pedido = datetime.now() - timedelta(
                 days=randint(0, 365),
                 hours=randint(0, 23),
                 minutes=randint(0, 59)
             )
 
-            # escolhe de 1 a 5 produtos distintos para o pedido
+            # Escolhe de 1 a 5 produtos distintos para o pedido
             produtos_pedido = self.faker.random_elements(
                 elements=produtos,
                 length=randint(1, min(5, len(produtos))),
                 unique=True
             )
 
-            # monta os itens e calcula o total antes de inserir o pedido
+            # Monta os itens e calcula o total antes de inserir o pedido
             itens = []
             total = 0
-            contador = 0
             for produto in produtos_pedido:
                 quantidade = randint(1, 5)
-                preco_unitario = produto[4]          # ajuste o índice se necessário
+                preco_unitario = produto[4]  # Índice 4 é o preço na tabela produtos
                 total += quantidade * preco_unitario
+                
                 itens.append({
                     "produto_id": produto[0],
                     "quantidade": quantidade,
                     "preco_unitario": float(preco_unitario),
                 })
 
-                pedido = {
-                    "cliente_id": cliente[0],
-                    "data_pedido": data_pedido,
-                    "status": choice(status_entrega),
-                    "valor_total": round(total, 2),
-                    "endereco_entrega": cliente[5],
-                    "status_pagamento": choice(status_pagamento),
-                    "forma_pagamento": choice(formas_pagamento),
-                }
+            # CORREÇÃO AQUI: O dicionário do pedido agora é montado FORA do loop de produtos
+            pedido = {
+                "cliente_id": cliente_id,
+                "data_pedido": data_pedido,
+                "status": choice(status_entrega),
+                "valor_total": round(total, 2),
+                "endereco_entrega": endereco_cliente,
+                "status_pagamento": choice(status_pagamento),
+                "forma_pagamento": choice(formas_pagamento),
+            }
 
-            
+            # Insere o pedido no banco
             self.db.inserir_tabela("pedidos", pedido)
 
-            # pega o id do pedido recém-inserido (o maior id da tabela)
+            # Pega o ID do pedido recém-inserido (maior ID da tabela)
             todos_pedidos = self.db.ler_tabela("pedidos")
             pedido_id = max(p[0] for p in todos_pedidos)
 
+            # Insere os itens vinculados ao pedido correto
             for item in itens:
                 item["pedido_id"] = pedido_id
                 self.db.inserir_tabela("itenspedido", item)
 
-        print(f"Pedido {pedido_id} criado com {len(itens)} itens | total: R$ {total:.2f}")
+            print(f"Pedido {pedido_id} criado com {len(itens)} itens | total: R$ {total:.2f}")
             
     def generate_all(self):
         self.generate_clientes()
