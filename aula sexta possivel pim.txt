@@ -1,8 +1,0 @@
-tela de cadastro
-tela de meu perfil
-na tela de meu perfil precisa ter 'atualizar dados'
-
-api/banco
-update de dados
-feitooo (relacionar tabelas entre si (exemplo: ao fazer um pedido, qual item e quem comprou)
-
